@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Net Platform — Sites & Serverless Management</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast-msg" class="toast-msg"></div>
+
+  <!-- Authentication Screen -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="logo-area">
+        <span class="logo-badge">⚡</span>
+        <h2>Web Net Platform</h2>
+      </div>
+      <p>Sign in to manage, deploy, and monitor your web applications</p>
+      
+      <form class="auth-form" onsubmit="login(event)">
+        <div class="form-group">
+          <label for="auth-email">Email Address</label>
+          <input type="email" id="auth-email" class="form-input" value="abedel@webnet.io" required />
+        </div>
+        <div class="form-group">
+          <label for="auth-password">Password</label>
+          <input type="password" id="auth-password" class="form-input" value="••••••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Sign In to Dashboard</button>
+        <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="login(event)">
+          🐙 Continue with GitHub
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app-container" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-logo">
+          <span class="logo-badge">🌐</span>
+          <span>Web Net Platform</span>
+        </div>
+        <ul class="nav-links" id="nav-tabs">
+          <li class="active" onclick="switchTab(0)">
+            <span>🌐</span> Sites
+          </li>
+          <li onclick="switchTab(1)">
+            <span>🔨</span> Builds
+          </li>
+          <li onclick="switchTab(2)">
+            <span>🧩</span> Extensions
+          </li>
+          <li onclick="switchTab(3)">
+            <span>👥</span> Members
+          </li>
+          <li onclick="switchTab(4)">
+            <span>📜</span> Audit log
+          </li>
+          <li onclick="switchTab(5)">
+            <span>🛡️</span> Security Scorecard
+          </li>
+          <li onclick="switchTab(6)">
+            <span>💳</span> Usage & billing
+          </li>
+          <li onclick="switchTab(7)">
+            <span>⚙️</span> Team settings
+          </li>
+        </ul>
+      </div>
+
+      <!-- User Profile & Dropdown -->
+      <div class="profile-wrapper">
+        <div class="user-dropdown" id="userDropdown">
+          <a href="mailto:abedel@webnet.io">📧 Email Settings</a>
+          <a href="https://github.com" target="_blank">🐙 Connect GitHub</a>
+          <a href="#" class="logout-link" onclick="logout(event)">🚪 Log Out</a>
+        </div>
+        <div class="user-profile sidebar-user-card" onclick="toggleDropdown(event)">
+          <div class="user-avatar user-initial-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Abedel Halwani</span>
+            <span class="user-status">● Active User ▾</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- TAB 0: SITES (Default Active) -->
+      <div class="tab-view active-view" id="view-0">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Sites</h1>
+            <p>Manage, deploy, and monitor your web applications and serverless services.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="openModal('modal-deploy-manual')">
+              📂 Deploy Manually
+            </button>
+            <button class="btn btn-primary" onclick="openModal('modal-new-site')">
+              + Add New Site
+            </button>
+          </div>
+        </header>
+
+        <!-- Toolbar / Search / Filter -->
+        <div class="toolbar-container">
+          <div class="search-filters-left">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="site-search" placeholder="Filter sites by name or domain..." />
+            </div>
+            <select id="status-filter" class="filter-select">
+              <option value="all">All statuses</option>
+              <option value="published">Published</option>
+              <option value="building">Building</option>
+              <option value="failed">Failed</option>
+            </select>
+            <select id="framework-filter" class="filter-select">
+              <option value="all">All frameworks</option>
+              <option value="CANVAS">Canvas</option>
+              <option value="NEXT.JS">Next.js</option>
+              <option value="ASTRO">Astro</option>
+              <option value="VITE">Vite / React</option>
+            </select>
+          </div>
+          <span id="sites-count" class="site-count-badge">Showing 4 sites</span>
+        </div>
+
+        <!-- Sites Grid -->
+        <div id="sites-grid" class="sites-grid"></div>
+      </div>
+
+      <!-- TAB 1: BUILDS -->
+      <div class="tab-view" id="view-1">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Builds & Continuous Deployments</h1>
+            <p>Monitor pipeline executions, build artifacts, and edge deployment statuses across all sites.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="showToast('⚡ Triggering CI/CD build matrix...')">
+              🔨 Trigger Manual Build
+            </button>
+          </div>
+        </header>
+        <div class="dashboard-card">
+          <h3>⚡ Active CI/CD Pipeline</h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Site</th>
+                  <th>Branch / Commit</th>
+                  <th>Triggered By</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>retro-shooter-live</strong></td>
+                  <td><code>main@8f3a1b</code></td>
+                  <td>GitHub Webhook (abedel)</td>
+                  <td>28s</td>
+                  <td><span class="status-badge published"><span class="status-dot"></span> Success</span></td>
+                </tr>
+                <tr>
+                  <td><strong>nexus-storefront</strong></td>
+                  <td><code>main@d51e8a</code></td>
+                  <td>GitHub Webhook (abedel)</td>
+                  <td>44s</td>
+                  <td><span class="status-badge published"><span class="status-dot"></span> Success</span></td>
+                </tr>
+                <tr>
+                  <td><strong>docs-webnet-platform</strong></td>
+                  <td><code>main@7c210f</code></td>
+                  <td>Manual Trigger</td>
+                  <td>19s</td>
+                  <td><span class="status-badge published"><span class="status-dot"></span> Success</span></td>
+                </tr>
+                <tr>
+                  <td><strong>dashboard-analytics-api</strong></td>
+                  <td><code>main@3a9b1c</code></td>
+                  <td>GitHub Webhook (abedel)</td>
+                  <td>22s</td>
+                  <td><span class="status-badge published"><span class="status-dot"></span> Success</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: EXTENSIONS -->
+      <div class="tab-view" id="view-2">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Extensions & Integrations</h1>
+            <p>Supercharge your projects with edge databases, automated testing, and CDN caching addons.</p>
+          </div>
+        </header>
+        <div class="content-grid">
+          <div class="dashboard-card">
+            <h3>🗄️ Edge KV & Serverless DB</h3>
+            <p>Ultra-low latency global key-value storage replicated to 240+ locations.</p>
+            <button class="btn btn-primary btn-sm" style="margin-top: 14px;" onclick="showToast('Extension enabled!')">Enabled</button>
+          </div>
+          <div class="dashboard-card">
+            <h3>🛡️ Cloudflare DDoS & WAF Guard</h3>
+            <p>Automated Layer 3/4/7 DDoS mitigation and customizable edge firewall rules.</p>
+            <button class="btn btn-primary btn-sm" style="margin-top: 14px;" onclick="showToast('Extension active!')">Active</button>
+          </div>
+          <div class="dashboard-card">
+            <h3>⚡ Next-Gen Image Optimizer</h3>
+            <p>On-the-fly WebP/AVIF transformation and responsive resizing at the edge.</p>
+            <button class="btn btn-secondary btn-sm" style="margin-top: 14px;" onclick="showToast('Extension installed!')">Install</button>
+          </div>
+          <div class="dashboard-card">
+            <h3>📈 Edge Analytics Pro</h3>
+            <p>Privacy-first visitor metrics without cookies or heavy client scripts.</p>
+            <button class="btn btn-primary btn-sm" style="margin-top: 14px;" onclick="showToast('Analytics extension configured!')">Enabled</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: MEMBERS -->
+      <div class="tab-view" id="view-3">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Team Members & Permissions</h1>
+            <p>Manage access levels, roles, and collaborative permissions for your engineering team.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="showToast('Invite link generated!')">
+              ➕ Invite Member
+            </button>
+          </div>
+        </header>
+        <div class="dashboard-card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>2FA Status</th>
+                  <th>Last Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Abedel Halwani</strong> (You)</td>
+                  <td>abedel@webnet.io</td>
+                  <td><span style="color:#38bdf8; font-weight:600;">Owner / Admin</span></td>
+                  <td><span style="color:#10b981;">● Enabled</span></td>
+                  <td>Now</td>
+                </tr>
+                <tr>
+                  <td>Sarah Connor</td>
+                  <td>sarah.c@webnet.io</td>
+                  <td>Developer</td>
+                  <td><span style="color:#10b981;">● Enabled</span></td>
+                  <td>2 hours ago</td>
+                </tr>
+                <tr>
+                  <td>Alex Rivera</td>
+                  <td>alex.r@webnet.io</td>
+                  <td>DevOps Engineer</td>
+                  <td><span style="color:#10b981;">● Enabled</span></td>
+                  <td>Yesterday</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: AUDIT LOG -->
+      <div class="tab-view" id="view-4">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Audit Log & Compliance</h1>
+            <p>Trace organizational events, deployment changes, and security configurations.</p>
+          </div>
+        </header>
+        <div class="dashboard-card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Actor</th>
+                  <th>Target</th>
+                  <th>IP Address</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>deploy.published</td>
+                  <td>abedel@webnet.io</td>
+                  <td>retro-shooter-live</td>
+                  <td>192.0.2.45</td>
+                  <td>2 mins ago</td>
+                </tr>
+                <tr>
+                  <td>env.variable.updated</td>
+                  <td>abedel@webnet.io</td>
+                  <td>nexus-storefront</td>
+                  <td>192.0.2.45</td>
+                  <td>3 hours ago</td>
+                </tr>
+                <tr>
+                  <td>domain.ssl.renewed</td>
+                  <td>system-bot</td>
+                  <td>docs-webnet-platform</td>
+                  <td>10.0.0.1</td>
+                  <td>Yesterday</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: SECURITY SCORECARD -->
+      <div class="tab-view" id="view-5">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Security Scorecard</h1>
+            <p>Real-time security posture evaluation, TLS certificates, and vulnerability defense.</p>
+          </div>
+        </header>
+        <div class="content-grid">
+          <div class="dashboard-card">
+            <h3>🔒 Overall Security Score</h3>
+            <div style="font-size: 42px; font-weight: 700; color: #10b981; margin: 12px 0;">98 / 100</div>
+            <p>Grade A+ across SSL TLS 1.3, Strict-Transport-Security, and CSP headers.</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>📜 Active Certificates</h3>
+            <p>4 wildcard SSL certificates automatically renewed with ZeroSSL & Let's Encrypt.</p>
+            <div style="margin-top: 10px; color: #38bdf8; font-size: 13px;">● All 4 domains protected</div>
+          </div>
+          <div class="dashboard-card">
+            <h3>🛡️ DDoS Mitigation</h3>
+            <p>0 attacks detected in last 24h. Edge rate limiting active on all public endpoints.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: USAGE & BILLING -->
+      <div class="tab-view" id="view-6">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Usage & Billing</h1>
+            <p>Track serverless invocations, bandwidth consumption, and billing cycle status.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="showToast('Billing invoice downloaded!')">
+              📄 Download Invoices
+            </button>
+          </div>
+        </header>
+        <div class="content-grid">
+          <div class="dashboard-card">
+            <h3>🌐 Bandwidth Used</h3>
+            <div style="font-size: 32px; font-weight: 700; color: #38bdf8; margin: 10px 0;">42.8 GB / 1 TB</div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 4.2%;"></div></div>
+          </div>
+          <div class="dashboard-card">
+            <h3>⚡ Edge Functions Invocations</h3>
+            <div style="font-size: 32px; font-weight: 700; color: #10b981; margin: 10px 0;">1.24M / 10M</div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 12.4%;"></div></div>
+          </div>
+          <div class="dashboard-card">
+            <h3>💳 Current Plan</h3>
+            <div style="font-size: 24px; font-weight: 700; color: #fff; margin: 10px 0;">Pro Organization</div>
+            <p style="font-size: 13px;">Next renewal date: September 28, 2026 ($29/month)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 7: TEAM SETTINGS -->
+      <div class="tab-view" id="view-7">
+        <header class="page-header">
+          <div class="page-title-area">
+            <h1>Organization & Team Settings</h1>
+            <p>Configure team slug, SSO authentication, webhooks, and environment variables.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="showToast('Team settings updated!')">
+              💾 Save Settings
+            </button>
+          </div>
+        </header>
+        <div class="dashboard-card" style="max-width: 650px;">
+          <form onsubmit="event.preventDefault(); showToast('Settings updated successfully!');">
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label>Organization Name</label>
+              <input type="text" class="form-input" value="Abedel Projects & Labs" />
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label>Team Slug</label>
+              <input type="text" class="form-input" value="abedel-labs" />
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label>Default Deploy Region</label>
+              <select class="form-select">
+                <option selected>Global Edge Network (Anycast)</option>
+                <option>US East (N. Virginia)</option>
+                <option>EU Central (Frankfurt)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL: ADD NEW SITE -->
+  <div id="modal-new-site" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">➕ Add New Site</div>
+        <button class="modal-close" onclick="closeModal('modal-new-site')">✕</button>
+      </div>
+      <form onsubmit="handleAddSite(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="new-site-name">Site Name (Subdomain)</label>
+            <input type="text" id="new-site-name" class="form-input" placeholder="e.g. my-awesome-app" required />
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="new-site-framework">Framework Preset</label>
+            <select id="new-site-framework" class="form-select">
+              <option value="NEXT.JS">Next.js</option>
+              <option value="CANVAS">HTML5 Canvas / Game</option>
+              <option value="ASTRO">Astro</option>
+              <option value="VITE / REACT">Vite / React</option>
+              <option value="VUE">Vue.js</option>
+              <option value="SVELTE">SvelteKit</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="new-site-repo">Git Repository (Optional)</label>
+            <input type="text" id="new-site-repo" class="form-input" placeholder="abedel/my-awesome-app" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-new-site')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Deploy Site</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DEPLOY MANUALLY -->
+  <div id="modal-deploy-manual" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">📂 Deploy Manually</div>
+        <button class="modal-close" onclick="closeModal('modal-deploy-manual')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: #94a3b8; font-size: 13.5px; margin-bottom: 16px;">
+          Drag and drop your project build output folder (e.g. <code>dist</code>, <code>build</code>, or static files) to instantly publish.
+        </p>
+        <div class="dropzone" onclick="document.getElementById('manual-deploy-file').click()">
+          <div class="dropzone-icon">☁️</div>
+          <p>Click to select or drag & drop build folder / ZIP archive</p>
+          <span>Supports HTML, CSS, JS, React, Vue, Next.js static exports</span>
+          <input type="file" id="manual-deploy-file" style="display: none;" onchange="handleManualDeploy(event)" />
+        </div>
+
+        <div id="deploy-progress-container" class="progress-bar-container">
+          <div class="progress-bar-track">
+            <div id="deploy-progress-bar" class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-status-text">
+            <span id="deploy-status-label">Uploading assets...</span>
+            <span id="deploy-percent-label">0%</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-deploy-manual')">Cancel</button>
+        <button type="button" id="deploy-start-btn" class="btn btn-primary" onclick="handleManualDeploy()">Start Deployment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DEPLOYS HISTORY & BUILD LOGS -->
+  <div id="modal-deploys-history" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div id="deploys-modal-title" class="modal-title">Deployments & Build Logs</div>
+        <button class="modal-close" onclick="closeModal('modal-deploys-history')">✕</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="color: #fff; margin-bottom: 12px; font-size: 14px;">Live Edge Build Logs</h4>
+        <div class="console-logs">
+[12:15:02] Initializing build container environment (Node.js 20.x, Bun runtime)...
+[12:15:04] Cloning repository from git@github.com:abedel/site.git (commit: 8f3a1b)...
+[12:15:07] Installing dependencies via pnpm --frozen-lockfile... (done in 3.1s)
+[12:15:12] Running build command: npm run build
+[12:15:18] Generating static pages and edge function bundles...
+[12:15:24] Optimizing client bundles and compressing assets with Brotli...
+[12:15:28] Deploying artifacts to 240+ Global Edge PoPs...
+[12:15:30] Site live at https://retro-shooter-live.webnet.app (Status: Published 200 OK)
+        </div>
+        <div style="margin-top: 16px;">
+          <h4 style="color: #fff; margin-bottom: 8px; font-size: 14px;">Past Deployments</h4>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Commit</th>
+                  <th>Branch</th>
+                  <th>Deploy Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>main@8f3a1b</code></td>
+                  <td>main</td>
+                  <td>2 minutes ago</td>
+                  <td><span class="status-badge published"><span class="status-dot"></span> Published</span></td>
+                </tr>
+                <tr>
+                  <td><code>feat@4d12aa</code></td>
+                  <td>feature/sound</td>
+                  <td>Yesterday</td>
+                  <td><span class="status-badge published"><span class="status-dot"></span> Published</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-deploys-history')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SITE SETTINGS -->
+  <div id="modal-site-settings" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div id="settings-modal-title" class="modal-title">Site Settings</div>
+        <button class="modal-close" onclick="closeModal('modal-site-settings')">✕</button>
+      </div>
+      <form onsubmit="saveSiteSettings(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>Site Name</label>
+            <input type="text" id="settings-site-name" class="form-input" />
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>Primary Domain</label>
+            <input type="text" id="settings-site-domain" class="form-input" />
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>Build Command</label>
+            <input type="text" class="form-input" value="npm run build" />
+          </div>
+          <div class="form-group">
+            <label>Publish Directory</label>
+            <input type="text" class="form-input" value="dist" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-site-settings')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ANALYTICS -->
+  <div id="modal-analytics" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div id="analytics-modal-title" class="modal-title">Real-time Analytics</div>
+        <button class="modal-close" onclick="closeModal('modal-analytics')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="content-grid" style="margin-bottom: 20px;">
+          <div class="dashboard-card" style="padding: 16px;">
+            <div style="font-size: 12px; color: #94a3b8;">PAGEVIEWS (24H)</div>
+            <div style="font-size: 26px; font-weight: 700; color: #38bdf8;">18,420</div>
+            <div style="font-size: 12px; color: #10b981;">↑ +14.2% vs yesterday</div>
+          </div>
+          <div class="dashboard-card" style="padding: 16px;">
+            <div style="font-size: 12px; color: #94a3b8;">UNIQUE VISITORS</div>
+            <div style="font-size: 26px; font-weight: 700; color: #a855f7;">6,210</div>
+            <div style="font-size: 12px; color: #10b981;">↑ +8.5%</div>
+          </div>
+          <div class="dashboard-card" style="padding: 16px;">
+            <div style="font-size: 12px; color: #94a3b8;">AVG EDGE LATENCY</div>
+            <div style="font-size: 26px; font-weight: 700; color: #10b981;">18ms</div>
+            <div style="font-size: 12px; color: #94a3b8;">Global 99th percentile</div>
+          </div>
+        </div>
+        <h4 style="color: #fff; margin-bottom: 8px; font-size: 14px;">Top Geographies</h4>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Country</th><th>Visitors</th><th>Edge Traffic</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>🇺🇸 United States</td><td>3,120</td><td>48%</td></tr>
+              <tr><td>🇩🇪 Germany</td><td>1,420</td><td>22%</td></tr>
+              <tr><td>🇯🇵 Japan</td><td>940</td><td>15%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-analytics')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RETRO SHOOTER CANVAS PLAY / PREVIEW -->
+  <div id="modal-game-preview" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">🎮 retro-shooter-live — Live Preview</div>
+        <button class="modal-close" onclick="closeModal('modal-game-preview')">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <canvas id="game-canvas"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-game-preview')">Exit Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Module -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
