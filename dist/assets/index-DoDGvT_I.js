@@ -1,0 +1,65 @@
+(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const o of document.querySelectorAll('link[rel="modulepreload"]'))l(o);new MutationObserver(o=>{for(const s of o)if(s.type==="childList")for(const c of s.addedNodes)c.tagName==="LINK"&&c.rel==="modulepreload"&&l(c)}).observe(document,{childList:!0,subtree:!0});function n(o){const s={};return o.integrity&&(s.integrity=o.integrity),o.referrerPolicy&&(s.referrerPolicy=o.referrerPolicy),o.crossOrigin==="use-credentials"?s.credentials="include":o.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function l(o){if(o.ep)return;o.ep=!0;const s=n(o);fetch(o.href,s)}})();let E=[{id:"retro-shooter-live",name:"retro-shooter-live",domain:"retro-shooter-live.webnet.app",framework:"CANVAS",icon:"🎮",status:"Published",gitRepo:"abedel/retro-shooter",gitBranch:"main@8f3a1b",lastDeploy:"2 minutes ago",buildDuration:"28s",hasGame:!0},{id:"nexus-storefront",name:"nexus-storefront",domain:"nexus-storefront.webnet.app",framework:"NEXT.JS",icon:"🛍️",status:"Published",gitRepo:"abedel/nexus-store",gitBranch:"main@d51e8a",lastDeploy:"3 hours ago",buildDuration:"44s",hasAnalytics:!0},{id:"docs-webnet-platform",name:"docs-webnet-platform",domain:"docs-webnet-platform.webnet.app",framework:"ASTRO",icon:"📚",status:"Published",gitRepo:"abedel/docs-portal",gitBranch:"main@7c210f",lastDeploy:"Yesterday",buildDuration:"19s",hasSettings:!0},{id:"dashboard-analytics-api",name:"dashboard-analytics-api",domain:"analytics.webnet.app",framework:"VITE / REACT",icon:"⚡",status:"Published",gitRepo:"abedel/analytics",gitBranch:"main@3a9b1c",lastDeploy:"4 days ago",buildDuration:"22s",hasAnalytics:!0}];const g={name:"Abedel Halwani",email:"abedel@webnet.io",avatar:"/avatar.svg",initial:"A",status:"● Active User ▾"};function p(t=g){const e=document.querySelector(".sidebar .user-profile, .sidebar .sidebar-user-card, .profile-wrapper .user-profile, .sidebar-footer .user-profile");if(!e)return;const n=t.initial||(t.name?t.name.trim().charAt(0).toUpperCase():"A");e.innerHTML=`
+    <div class="user-avatar user-initial-avatar">${n}</div>
+    <div class="user-info">
+      <span class="user-name">${t.name}</span>
+      <span class="user-status">${t.status}</span>
+    </div>
+  `}function I(t=g){p(t)}function D(t=g){p(t)}function M(t=g){p(t)}function T(t=g){p(t)}function h(t){let e=document.getElementById("toast-msg");e||(e=document.createElement("div"),e.id="toast-msg",e.className="toast-msg",document.body.appendChild(e)),e.innerText=t,e.style.display="block",setTimeout(()=>{e.style.display="none"},3500)}function k(t){t&&t.preventDefault();const e=document.getElementById("auth-screen"),n=document.getElementById("app-container");e&&(e.style.display="none"),n&&(n.style.display="flex"),p(),B(0),h("Welcome back, Abedel Halwani!")}function L(t){t&&(t.preventDefault(),t.stopPropagation()),S();const e=document.getElementById("app-container"),n=document.getElementById("auth-screen");e&&(e.style.display="none"),n&&(n.style.display="flex"),h("You have been successfully logged out.")}function $(t){t&&t.stopPropagation();const e=document.getElementById("userDropdown");e&&e.classList.toggle("show")}function S(){const t=document.getElementById("userDropdown");t&&t.classList.remove("show")}window.addEventListener("click",function(t){t.target.closest(".profile-wrapper")||S()});function B(t){const e=document.getElementsByClassName("tab-view");for(let o=0;o<e.length;o++)e[o].classList.remove("active-view");const n=document.getElementById("view-"+t);n&&n.classList.add("active-view");const l=document.getElementById("nav-tabs");if(l){const o=l.getElementsByTagName("li");for(let s=0;s<o.length;s++)s===t?o[s].classList.add("active"):o[s].classList.remove("active")}S()}function b(t){const e=document.getElementById(t);e&&e.classList.add("show")}function x(t){const e=document.getElementById(t);e&&e.classList.remove("show"),t==="modal-game-preview"&&V()}function y(){const t=document.getElementById("sites-grid"),e=document.getElementById("sites-count"),n=document.getElementById("site-search"),l=document.getElementById("status-filter"),o=document.getElementById("framework-filter");if(!t)return;const s=n?n.value.trim().toLowerCase():"",c=l?l.value:"all",u=o?o.value:"all",d=E.filter(i=>{const w=i.name.toLowerCase().includes(s)||i.domain.toLowerCase().includes(s)||i.framework.toLowerCase().includes(s)||i.gitRepo.toLowerCase().includes(s),m=c==="all"||i.status.toLowerCase()===c.toLowerCase(),a=u==="all"||i.framework.toLowerCase().includes(u.toLowerCase());return w&&m&&a});if(e&&(e.innerText=`Showing ${d.length} site${d.length===1?"":"s"}`),d.length===0){t.innerHTML=`
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #112238; border-radius: 12px; border: 1px dashed #1e3a5f;">
+        <div style="font-size: 36px; margin-bottom: 12px;">🔍</div>
+        <h3 style="color: #fff; margin-bottom: 8px;">No sites match your filter</h3>
+        <p style="color: #94a3b8; font-size: 14px;">Try refining your search keyword or resetting the status/framework filter.</p>
+      </div>
+    `;return}t.innerHTML=d.map(i=>{const w=i.status.toLowerCase();let m="";return i.hasGame||i.framework==="CANVAS"?m=`
+        <button class="btn btn-secondary btn-sm" onclick="openPlayPreview('${i.name}')">▶ Play / Preview</button>
+        <button class="btn btn-secondary btn-sm" onclick="openDeploysModal('${i.name}')">📄 Deploys</button>
+        <button class="btn btn-secondary btn-sm" onclick="openSettingsModal('${i.name}')">⚙️ Settings</button>
+      `:i.hasAnalytics?m=`
+        <a href="https://${i.domain}" target="_blank" class="btn btn-secondary btn-sm" style="text-align:center;">🔗 Visit Site</a>
+        <button class="btn btn-secondary btn-sm" onclick="openDeploysModal('${i.name}')">📄 Deploys</button>
+        <button class="btn btn-secondary btn-sm" onclick="openAnalyticsModal('${i.name}')">📊 Analytics</button>
+      `:m=`
+        <a href="https://${i.domain}" target="_blank" class="btn btn-secondary btn-sm" style="text-align:center;">🔗 Visit Site</a>
+        <button class="btn btn-secondary btn-sm" onclick="openDeploysModal('${i.name}')">📄 Deploys</button>
+        <button class="btn btn-secondary btn-sm" onclick="openSettingsModal('${i.name}')">⚙️ Settings</button>
+      `,`
+      <div class="site-card">
+        <div class="site-top">
+          <div class="site-framework-icon">${i.icon}</div>
+          <div class="site-meta">
+            <div class="site-framework-tag">${i.framework}</div>
+            <div class="site-name">${i.name}</div>
+            <a href="https://${i.domain}" target="_blank" class="site-domain-link">
+              ${i.domain} ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="site-status-row">
+          <span style="color: #94a3b8;">Production:</span>
+          <span class="status-badge ${w}">
+            <span class="status-dot"></span>
+            ${i.status}
+          </span>
+        </div>
+
+        <div class="site-git-info">
+          <div class="git-repo-line">
+            <span>🐙 github:</span>
+            <span style="color: #f1f5f9; font-weight: 500;">${i.gitRepo}</span>
+          </div>
+          <div class="git-branch-commit">
+            <span>${i.gitBranch}</span>
+          </div>
+        </div>
+
+        <div class="site-deploy-stats">
+          <span>Last deploy: ${i.lastDeploy}</span>
+          <span>Build: ${i.buildDuration}</span>
+        </div>
+
+        <div class="site-actions">
+          ${m}
+        </div>
+      </div>
+    `}).join("")}function A(t){t.preventDefault();const e=document.getElementById("new-site-name"),n=document.getElementById("new-site-framework"),l=document.getElementById("new-site-repo"),o=e.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,"-"),s=n.value,c=l.value.trim()||`abedel/${o}`;if(!o){alert("Please enter a site name.");return}let u="🌐";s==="NEXT.JS"?u="🛍️":s==="CANVAS"?u="🎮":s==="ASTRO"?u="📚":s==="VITE / REACT"?u="⚡":s==="VUE"?u="💚":s==="SVELTE"&&(u="🔥");const d={id:o,name:o,domain:`${o}.webnet.app`,framework:s,icon:u,status:"Published",gitRepo:c,gitBranch:"main@"+Math.random().toString(16).substring(2,8),lastDeploy:"Just now",buildDuration:`${Math.floor(Math.random()*25+15)}s`,hasSettings:!0,hasAnalytics:!0};E.unshift(d),y(),x("modal-new-site"),e.value="",l.value="",h(`🚀 Successfully created and deployed site: ${o}!`)}function P(t){t&&t.preventDefault(),document.getElementById("manual-deploy-file");const e=document.getElementById("deploy-progress-container"),n=document.getElementById("deploy-progress-bar"),l=document.getElementById("deploy-status-label"),o=document.getElementById("deploy-percent-label"),s=document.getElementById("deploy-start-btn");e&&(e.style.display="block"),s&&(s.disabled=!0);let c=0;const u=[{p:20,text:"Uploading site assets (HTML/CSS/JS)..."},{p:45,text:"Optimizing images and running edge bundling..."},{p:75,text:"Deploying to WebNet Global Edge Network (240+ PoPs)..."},{p:100,text:"Deployment published and verified live!"}];let d=0;const i=setInterval(()=>{c+=5,n&&(n.style.width=`${c}%`),o&&(o.innerText=`${c}%`),d<u.length&&c>=u[d].p&&(l&&(l.innerText=u[d].text),d++),c>=100&&(clearInterval(i),setTimeout(()=>{x("modal-deploy-manual"),e&&(e.style.display="none"),n&&(n.style.width="0%"),s&&(s.disabled=!1),h("✅ Manual deploy completed and published!")},1e3))},100)}function C(t){const e=document.getElementById("deploys-modal-title");e&&(e.innerText=`Deployments & Build Logs — ${t}`),b("modal-deploys-history")}function R(t){const e=document.getElementById("settings-modal-title"),n=document.getElementById("settings-site-name"),l=document.getElementById("settings-site-domain");e&&(e.innerText=`Site Settings — ${t}`),n&&(n.value=t),l&&(l.value=`${t}.webnet.app`),b("modal-site-settings")}function N(t){const e=document.getElementById("analytics-modal-title");e&&(e.innerText=`Real-time Analytics — ${t}`),b("modal-analytics")}function U(t){t&&t.preventDefault(),x("modal-site-settings"),h("⚙️ Site settings saved successfully!")}let v=null;function F(t){b("modal-game-preview"),O()}function O(){const t=document.getElementById("game-canvas");if(!t)return;const e=t.getContext("2d");t.width=600,t.height=400;let n={x:t.width/2-15,y:t.height-40,width:30,height:20,speed:5},l=[],o=[],s=[],c=0,u=0;for(let a=0;a<60;a++)s.push({x:Math.random()*t.width,y:Math.random()*t.height,size:Math.random()*2+1,speed:Math.random()*1.5+.5});const d={};window.onkeydown=a=>{d[a.code]=!0,a.code==="Space"&&(l.push({x:n.x+n.width/2-2,y:n.y,width:4,height:10,speed:7}),a.preventDefault())},window.onkeyup=a=>{d[a.code]=!1};function i(){(d.ArrowLeft||d.KeyA)&&(n.x-=n.speed,n.x<0&&(n.x=0)),(d.ArrowRight||d.KeyD)&&(n.x+=n.speed,n.x+n.width>t.width&&(n.x=t.width-n.width)),s.forEach(r=>{r.y+=r.speed,r.y>t.height&&(r.y=0,r.x=Math.random()*t.width)});for(let r=l.length-1;r>=0;r--)l[r].y-=l[r].speed,l[r].y<-10&&l.splice(r,1);const a=Date.now();a-u>800&&(o.push({x:Math.random()*(t.width-30),y:-30,width:26,height:20,speed:Math.random()*2+1.5,color:["#ef4444","#f59e0b","#a855f7","#ec4899"][Math.floor(Math.random()*4)]}),u=a);for(let r=o.length-1;r>=0;r--){o[r].y+=o[r].speed;for(let f=l.length-1;f>=0;f--)if(l[f].x<o[r].x+o[r].width&&l[f].x+l[f].width>o[r].x&&l[f].y<o[r].y+o[r].height&&l[f].y+l[f].height>o[r].y){o.splice(r,1),l.splice(f,1),c+=100;break}o[r]&&o[r].y>t.height&&o.splice(r,1)}}function w(){e.fillStyle="#070d19",e.fillRect(0,0,t.width,t.height),e.fillStyle="#ffffff",s.forEach(a=>{e.fillRect(a.x,a.y,a.size,a.size)}),e.fillStyle="#38bdf8",e.beginPath(),e.moveTo(n.x+n.width/2,n.y),e.lineTo(n.x,n.y+n.height),e.lineTo(n.x+n.width,n.y+n.height),e.closePath(),e.fill(),e.fillStyle="#4ade80",l.forEach(a=>{e.fillRect(a.x,a.y,a.width,a.height)}),o.forEach(a=>{e.fillStyle=a.color,e.beginPath(),e.moveTo(a.x,a.y),e.lineTo(a.x+a.width,a.y),e.lineTo(a.x+a.width/2,a.y+a.height),e.closePath(),e.fill()}),e.fillStyle="#ffffff",e.font="14px 'JetBrains Mono', monospace",e.fillText(`SCORE: ${c}`,16,26),e.fillStyle="#94a3b8",e.fillText("Controls: [A/D or Arrows] Move, [Space] Shoot",16,t.height-14)}function m(){i(),w(),v=requestAnimationFrame(m)}m()}function V(){v&&(cancelAnimationFrame(v),v=null)}window.currentUser=g;window.renderUserProfile=p;window.renderSidebarFooter=I;window.renderUserProfileCard=D;window.renderSidebarUserProfile=M;window.renderSidebarProfile=T;window.login=k;window.logout=L;window.switchTab=B;window.toggleDropdown=$;window.closeDropdown=S;window.openModal=b;window.closeModal=x;window.renderSites=y;window.handleAddSite=A;window.handleManualDeploy=P;window.openDeploysModal=C;window.openSettingsModal=R;window.openAnalyticsModal=N;window.openPlayPreview=F;window.saveSiteSettings=U;window.showToast=h;document.addEventListener("DOMContentLoaded",()=>{p(),y();const t=document.getElementById("site-search"),e=document.getElementById("status-filter"),n=document.getElementById("framework-filter");t&&t.addEventListener("input",y),e&&e.addEventListener("change",y),n&&n.addEventListener("change",y)});
